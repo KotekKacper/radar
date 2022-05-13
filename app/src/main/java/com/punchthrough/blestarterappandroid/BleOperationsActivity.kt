@@ -21,6 +21,7 @@ import android.app.Activity
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -32,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.punchthrough.blestarterappandroid.ble.ConnectionEventListener
 import com.punchthrough.blestarterappandroid.ble.ConnectionManager
+import com.punchthrough.blestarterappandroid.ble.RadarActivity
 import com.punchthrough.blestarterappandroid.ble.isIndicatable
 import com.punchthrough.blestarterappandroid.ble.isNotifiable
 import com.punchthrough.blestarterappandroid.ble.isReadable
@@ -166,6 +168,10 @@ class BleOperationsActivity : AppCompatActivity() {
                         showWritePayloadDialog(characteristic)
                     }
                     CharacteristicProperty.Notifiable, CharacteristicProperty.Indicatable -> {
+                        // Added ASK
+                        val radar = Intent(this, RadarActivity::class.java)
+                        startActivity(radar)
+                        // End added
                         if (notifyingCharacteristics.contains(characteristic.uuid)) {
                             log("Disabling notifications on ${characteristic.uuid}")
                             ConnectionManager.disableNotifications(device, characteristic)
@@ -226,7 +232,7 @@ class BleOperationsActivity : AppCompatActivity() {
             }
 
             onCharacteristicChanged = { _, characteristic ->
-                log("Value changed on ${characteristic.uuid}: ${characteristic.value.toHexString()}")
+                log("Value changed on ${characteristic.uuid}: ${String(characteristic.value, charset("UTF-8"))}")
             }
 
             onNotificationsEnabled = { _, characteristic ->
