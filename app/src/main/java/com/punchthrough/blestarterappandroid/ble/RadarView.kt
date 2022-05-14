@@ -22,8 +22,10 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.SweepGradient
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
+import android.widget.Toast
 import com.punchthrough.blestarterappandroid.R
 import java.util.*
 import kotlin.math.max
@@ -205,6 +207,7 @@ class RadarView @JvmOverloads constructor(
         //计算圆的圆心
         val cx = paddingLeft + (width - paddingLeft - paddingRight) / 2
         val cy = paddingTop + (height - paddingTop - paddingBottom) / 2
+        Log.i("Data: ", "$mRaindrops")
 
         drawCircle(canvas!!, cx, cy, radius)//画圆
 
@@ -266,8 +269,8 @@ class RadarView @JvmOverloads constructor(
     /**
      * 画雨点(就是在扫描的过程中随机出现的点)。
      */
-    private fun drawRaindrop(canvas: Canvas, cx: Int, cy: Int, radius: Int) {
-        generateRaindrop(cx, cy, radius)
+    fun drawRaindrop(canvas: Canvas, cx: Int, cy: Int, radius: Int) {
+//        generateRaindrop(cx, cy, radius)
         for (raindrop in mRaindrops) {
             mRaindropPaint.color = raindrop.changeAlpha()
             canvas.drawCircle(
@@ -308,7 +311,7 @@ class RadarView @JvmOverloads constructor(
     /**
      * 生成水滴。水滴的生成是随机的，并不是每次调用都会生成一个水滴。
      */
-    private fun generateRaindrop(cx: Int, cy: Int, radius: Int) {
+    fun generateRaindrop(cx: Int, cy: Int, radius: Int) {
         // 最多只能同时存在mRaindropNum个水滴。
         if (mRaindrops.size < mRaindropNum) {
             // 随机一个20以内的数字，如果这个数字刚好是0，就生成一个水滴。
@@ -337,6 +340,11 @@ class RadarView @JvmOverloads constructor(
             }
         }
     }
+    fun addRaindrop(x: Int, y: Int){
+        Log.i("x,y", "$x, $y")
+        mRaindrops.add(Raindrop(x, y, 0f, mRaindropColor))
+        invalidate()
+    }
 
     /**
      * 删除水滴
@@ -355,6 +363,7 @@ class RadarView @JvmOverloads constructor(
      * 开始扫描
      */
     fun start() {
+        Log.i("x,y", "Siemka")
         if (!isScanning) {
             isScanning = true
             invalidate()

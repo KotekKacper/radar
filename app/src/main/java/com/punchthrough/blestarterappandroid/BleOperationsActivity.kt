@@ -22,11 +22,13 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +36,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.punchthrough.blestarterappandroid.ble.ConnectionEventListener
 import com.punchthrough.blestarterappandroid.ble.ConnectionManager
 import com.punchthrough.blestarterappandroid.ble.RadarActivity
+import com.punchthrough.blestarterappandroid.ble.RadarView
 import com.punchthrough.blestarterappandroid.ble.isIndicatable
 import com.punchthrough.blestarterappandroid.ble.isNotifiable
 import com.punchthrough.blestarterappandroid.ble.isReadable
@@ -45,6 +48,7 @@ import kotlinx.android.synthetic.main.activity_ble_operations.log_scroll_view
 import kotlinx.android.synthetic.main.activity_ble_operations.log_text_view
 import kotlinx.android.synthetic.main.activity_ble_operations.mtu_field
 import kotlinx.android.synthetic.main.activity_ble_operations.request_mtu_button
+import kotlinx.android.synthetic.main.activity_radar.radar
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.selector
@@ -54,6 +58,10 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
+import kotlinx.android.synthetic.main.activity_ble_operations.*
+
+
+@RequiresApi(Build.VERSION_CODES.N)
 class BleOperationsActivity : AppCompatActivity() {
 
     private lateinit var device: BluetoothDevice
@@ -107,6 +115,8 @@ class BleOperationsActivity : AppCompatActivity() {
             }
             hideKeyboard()
         }
+
+        radar.start()
     }
 
     override fun onDestroy() {
@@ -156,6 +166,16 @@ class BleOperationsActivity : AppCompatActivity() {
         }
     }
 
+    fun displayRaindrop(str: String){
+        val ls = str.split("--")
+        val angle = ls[0].substring(0, ls[0].length-1).toInt()
+        val distance = ls[1].substring(1, ls[1].length-2).toInt()
+
+        if (angle%5 == 0)
+            radar.addRaindrop(angle, distance)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun showCharacteristicOptions(characteristic: BluetoothGattCharacteristic) {
         characteristicProperties[characteristic]?.let { properties ->
             selector("Select an action to perform", properties.map { it.action }) { _, i ->
@@ -169,8 +189,11 @@ class BleOperationsActivity : AppCompatActivity() {
                     }
                     CharacteristicProperty.Notifiable, CharacteristicProperty.Indicatable -> {
                         // Added ASK
-                        val radar = Intent(this, RadarActivity::class.java)
-                        startActivity(radar)
+//                        Intent(this, RadarActivity::class.java).also {
+//                            it.putExtra(BluetoothDevice.EXTRA_DEVICE, device)
+//                            it.putExtra("characteristic", characteristic)
+//                            startActivity(it)
+//                        }
                         // End added
                         if (notifyingCharacteristics.contains(characteristic.uuid)) {
                             log("Disabling notifications on ${characteristic.uuid}")
@@ -232,7 +255,9 @@ class BleOperationsActivity : AppCompatActivity() {
             }
 
             onCharacteristicChanged = { _, characteristic ->
-                log("Value changed on ${characteristic.uuid}: ${String(characteristic.value, charset("UTF-8"))}")
+                displayRaindrop(String(characteristic.value, charset("UTF-8")))
+//                log("Value changed on ${characteristic.uuid}: ${String(characteristic.value, charset("UTF-8"))}")
+                // TODO add the drop on the radar
             }
 
             onNotificationsEnabled = { _, characteristic ->
@@ -246,6 +271,8 @@ class BleOperationsActivity : AppCompatActivity() {
             }
         }
     }
+
+
 
     private enum class CharacteristicProperty {
         Readable,

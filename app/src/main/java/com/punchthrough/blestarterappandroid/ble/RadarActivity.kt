@@ -21,13 +21,19 @@ import androidx.appcompat.app.AppCompatActivity
 import com.punchthrough.blestarterappandroid.R
 import kotlinx.android.synthetic.main.activity_radar.*
 
-class RadarActivity : AppCompatActivity() {
+
+open class RadarActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_radar)
 
+        radar.start()
+
+
+
         btn_start.setOnClickListener {
-            radar.start()
+            radar.addRaindrop(20, 20)
         }
 
         btn_stop.setOnClickListener {

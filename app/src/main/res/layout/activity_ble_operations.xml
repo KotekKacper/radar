@@ -15,13 +15,28 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
     tools:context=".BleOperationsActivity">
+
+    <com.punchthrough.blestarterappandroid.ble.RadarView
+        android:id="@+id/radar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:kv_circleColor="#FF8800"
+        app:kv_circleNum="4"
+        app:kv_flicker="3"
+        app:kv_speed="5"
+        app:kv_sweepColor="#009944"
+        app:kv_showCrossLine="true"
+        app:kv_raindropNum="4"/>
 
     <LinearLayout
         android:id="@+id/mtu_container"
@@ -67,6 +82,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_weight="1"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp">
@@ -108,4 +124,4 @@
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

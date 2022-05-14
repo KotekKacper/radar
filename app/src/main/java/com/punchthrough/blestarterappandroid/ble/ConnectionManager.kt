@@ -41,7 +41,7 @@ private const val GATT_MAX_MTU_SIZE = 517
 
 object ConnectionManager {
 
-    private var listeners: MutableSet<WeakReference<ConnectionEventListener>> = mutableSetOf()
+    var listeners: MutableSet<WeakReference<ConnectionEventListener>> = mutableSetOf()
 
     private val deviceGattMap = ConcurrentHashMap<BluetoothDevice, BluetoothGatt>()
     private val operationQueue = ConcurrentLinkedQueue<BleOperationType>()
