@@ -84,6 +84,8 @@ class RadarView @JvmOverloads constructor(
 
     //保存水滴数据
     private val mRaindrops = ArrayList<Raindrop>()
+    private val mAngles = ArrayList<Int>()
+    private var ang = 0
 
     init {
         initAttrs(context,attrs)
@@ -207,7 +209,6 @@ class RadarView @JvmOverloads constructor(
         //计算圆的圆心
         val cx = paddingLeft + (width - paddingLeft - paddingRight) / 2
         val cy = paddingTop + (height - paddingTop - paddingBottom) / 2
-        Log.i("Data: ", "$mRaindrops")
 
         drawCircle(canvas!!, cx, cy, radius)//画圆
 
@@ -270,7 +271,6 @@ class RadarView @JvmOverloads constructor(
      * 画雨点(就是在扫描的过程中随机出现的点)。
      */
     fun drawRaindrop(canvas: Canvas, cx: Int, cy: Int, radius: Int) {
-//        generateRaindrop(cx, cy, radius)
         for (raindrop in mRaindrops) {
             mRaindropPaint.color = raindrop.changeAlpha()
             canvas.drawCircle(
@@ -304,8 +304,14 @@ class RadarView @JvmOverloads constructor(
         )
         mSweepPaint.shader = sweepGradient
         //先旋转画布，再绘制扫描的颜色渲染，实现扫描时的旋转效果。
-        canvas.rotate(-90 + mDegrees, cx.toFloat(), cy.toFloat())
+
+        if (mAngles.isNotEmpty()){
+            ang = -mAngles[0]
+            mAngles.removeAt(0)
+        }
+        canvas.rotate(ang.toFloat(), cx.toFloat(), cy.toFloat())
         canvas.drawCircle(cx.toFloat(), cy.toFloat(), radius.toFloat(), mSweepPaint)
+
     }
 
     /**
@@ -344,6 +350,9 @@ class RadarView @JvmOverloads constructor(
         Log.i("x,y", "$x, $y")
         mRaindrops.add(Raindrop(x, y, 0f, mRaindropColor))
         invalidate()
+    }
+    fun addAngle(angle: Int){
+        mAngles.add(angle)
     }
 
     /**

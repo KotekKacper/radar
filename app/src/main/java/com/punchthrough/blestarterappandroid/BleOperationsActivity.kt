@@ -24,6 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -59,10 +60,13 @@ import java.util.Locale
 import java.util.UUID
 
 import kotlinx.android.synthetic.main.activity_ble_operations.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 @RequiresApi(Build.VERSION_CODES.N)
 class BleOperationsActivity : AppCompatActivity() {
+    private var distances: MutableList<Int> = mutableListOf()
 
     private lateinit var device: BluetoothDevice
     private val dateFormatter = SimpleDateFormat("MMM d, HH:mm:ss", Locale.US)
@@ -115,8 +119,6 @@ class BleOperationsActivity : AppCompatActivity() {
             }
             hideKeyboard()
         }
-
-        radar.start()
     }
 
     override fun onDestroy() {
@@ -166,13 +168,30 @@ class BleOperationsActivity : AppCompatActivity() {
         }
     }
 
-    fun displayRaindrop(str: String){
+    private fun calculatePosition(angle: Int, distance: Int): Array<Int>{
+        val x = distance * sin(Math.PI * 2 * (angle+90) / 360);
+        val y = distance * cos(Math.PI * 2 * (angle+90) / 360);
+        return arrayOf(x.toInt(), y.toInt())
+    }
+
+    private fun displayRaindrop(str: String){
         val ls = str.split("--")
         val angle = ls[0].substring(0, ls[0].length-1).toInt()
         val distance = ls[1].substring(1, ls[1].length-2).toInt()
 
-        if (angle%5 == 0)
-            radar.addRaindrop(angle, distance)
+
+
+        val nrOfStackedValues = 10
+        if (angle % nrOfStackedValues != 0){
+            distances.add(distance)
+            radar.addAngle(angle-(nrOfStackedValues/2))
+        }
+        else
+            if (distance < 100) {
+                var pos = calculatePosition(angle-(nrOfStackedValues/2), distances.average().toInt())
+                distances = mutableListOf()
+                radar.addRaindrop(pos[0]*10+275, pos[1]*10+275)
+            }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -198,9 +217,11 @@ class BleOperationsActivity : AppCompatActivity() {
                         if (notifyingCharacteristics.contains(characteristic.uuid)) {
                             log("Disabling notifications on ${characteristic.uuid}")
                             ConnectionManager.disableNotifications(device, characteristic)
+                            radar.stop()
                         } else {
                             log("Enabling notifications on ${characteristic.uuid}")
                             ConnectionManager.enableNotifications(device, characteristic)
+                            radar.start()
                         }
                     }
                 }

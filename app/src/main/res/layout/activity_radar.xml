@@ -19,7 +19,7 @@
         app:kv_speed="5"
         app:kv_sweepColor="#009944"
         app:kv_showCrossLine="true"
-        app:kv_raindropNum="4"/>
+        app:kv_raindropNum="10"/>
 
     <Button
         android:id="@+id/btn_start"
