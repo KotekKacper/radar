@@ -10,16 +10,17 @@
 
     <com.punchthrough.blestarterappandroid.ble.RadarView
         android:id="@+id/radar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
         android:layout_margin="20dp"
         app:kv_circleColor="#FF8800"
-        app:kv_circleNum="4"
+        app:kv_circleNum="15"
         app:kv_flicker="3"
+        app:kv_raindropNum="10"
+        app:kv_showCrossLine="true"
         app:kv_speed="5"
         app:kv_sweepColor="#009944"
-        app:kv_showCrossLine="true"
-        app:kv_raindropNum="10"/>
+        />
 
     <Button
         android:id="@+id/btn_start"

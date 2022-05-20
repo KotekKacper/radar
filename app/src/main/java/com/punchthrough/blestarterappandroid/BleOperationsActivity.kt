@@ -47,8 +47,6 @@ import com.punchthrough.blestarterappandroid.ble.toHexString
 import kotlinx.android.synthetic.main.activity_ble_operations.characteristics_recycler_view
 import kotlinx.android.synthetic.main.activity_ble_operations.log_scroll_view
 import kotlinx.android.synthetic.main.activity_ble_operations.log_text_view
-import kotlinx.android.synthetic.main.activity_ble_operations.mtu_field
-import kotlinx.android.synthetic.main.activity_ble_operations.request_mtu_button
 import kotlinx.android.synthetic.main.activity_radar.radar
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
@@ -108,17 +106,6 @@ class BleOperationsActivity : AppCompatActivity() {
             title = getString(R.string.ble_playground)
         }
         setupRecyclerView()
-        request_mtu_button.setOnClickListener {
-            if (mtu_field.text.isNotEmpty() && mtu_field.text.isNotBlank()) {
-                mtu_field.text.toString().toIntOrNull()?.let { mtu ->
-                    log("Requesting for MTU value of $mtu")
-                    ConnectionManager.requestMtu(device, mtu)
-                } ?: log("Invalid MTU value: ${mtu_field.text}")
-            } else {
-                log("Please specify a numeric value for desired ATT MTU (23-517)")
-            }
-            hideKeyboard()
-        }
     }
 
     override fun onDestroy() {
@@ -179,18 +166,15 @@ class BleOperationsActivity : AppCompatActivity() {
         val angle = ls[0].substring(0, ls[0].length-1).toInt()
         val distance = ls[1].substring(1, ls[1].length-2).toInt()
 
-
-
-        val nrOfStackedValues = 10
-        if (angle % nrOfStackedValues != 0){
+        if (angle % 10 != 0){
             distances.add(distance)
-            radar.addAngle(angle-(nrOfStackedValues/2))
+            radar.addAngle(angle)
         }
         else
-            if (distance < 100) {
-                var pos = calculatePosition(angle-(nrOfStackedValues/2), distances.average().toInt())
+            if (distance < 70) {
+                val pos = calculatePosition(angle, distances.average().toInt())
                 distances = mutableListOf()
-                radar.addRaindrop(pos[0]*10+275, pos[1]*10+275)
+                radar.addRaindrop(pos[0]*7+525, pos[1]*7+525)
             }
     }
 
@@ -292,8 +276,6 @@ class BleOperationsActivity : AppCompatActivity() {
             }
         }
     }
-
-
 
     private enum class CharacteristicProperty {
         Readable,
