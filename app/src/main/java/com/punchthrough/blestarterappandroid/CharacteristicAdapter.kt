@@ -20,8 +20,6 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.punchthrough.blestarterappandroid.ble.printProperties
-import kotlinx.android.synthetic.main.row_characteristic.view.characteristic_properties
 import kotlinx.android.synthetic.main.row_characteristic.view.characteristic_uuid
 import org.jetbrains.anko.layoutInflater
 
@@ -52,9 +50,11 @@ class CharacteristicAdapter(
     ) : RecyclerView.ViewHolder(view) {
 
         fun bind(characteristic: BluetoothGattCharacteristic) {
-            view.characteristic_uuid.text = characteristic.uuid.toString()
-            view.characteristic_properties.text = characteristic.printProperties()
+            // 0000ffe1-0000-1000-8000-00805f9b34fb
+           // if (view.characteristic_uuid.text == "0000ffe1-0000-1000-8000-00805f9b34fb"){
+            view.characteristic_uuid.text = "                                    START RADAR"
             view.setOnClickListener { onClickListener.invoke(characteristic) }
+           // }
         }
     }
 }
